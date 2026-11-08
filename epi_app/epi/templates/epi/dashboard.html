@@ -1,0 +1,75 @@
+{% extends "epi/base.html" %}
+{% block titre %}Tableau de bord{% endblock %}
+{% block contenu %}
+<h2 class="mb-4">Tableau de bord</h2>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card card-indicateur p-3 text-center">
+            <div class="text-muted small">Employés</div>
+            <div class="fs-2 fw-bold">{{ total_employes }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-indicateur p-3 text-center">
+            <div class="text-muted small">EPI attribués</div>
+            <div class="fs-2 fw-bold">{{ total_attributions }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-indicateur p-3 text-center">
+            <div class="text-muted small">Taux de conformité</div>
+            <div class="fs-2 fw-bold text-success">{{ taux_conformite }}%</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-indicateur p-3 text-center">
+            <div class="text-muted small">Alertes actives</div>
+            <div class="fs-2 fw-bold text-danger">{{ nb_expire|add:nb_a_renouveler }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card card-indicateur p-3">
+            <h5>Répartition des statuts</h5>
+            <canvas id="chartStatuts" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-indicateur p-3">
+            <h5>Équipements expirés par atelier</h5>
+            <canvas id="chartAteliers" height="220"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+new Chart(document.getElementById('chartStatuts'), {
+    type: 'pie',
+    data: {
+        labels: {{ statut_labels|safe }},
+        datasets: [{
+            data: {{ statut_data|safe }},
+            backgroundColor: ['#198754', '#fd7e14', '#dc3545']
+        }]
+    }
+});
+
+new Chart(document.getElementById('chartAteliers'), {
+    type: 'bar',
+    data: {
+        labels: {{ ateliers_labels|safe }},
+        datasets: [{
+            label: 'Équipements expirés',
+            data: {{ ateliers_data|safe }},
+            backgroundColor: '#1F4E78'
+        }]
+    },
+    options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+});
+</script>
+{% endblock %}

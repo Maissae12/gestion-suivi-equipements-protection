@@ -1,0 +1,13 @@
+{% extends "gestionepi/base.html" %}
+{% block titre %}Confirmer la suppression{% endblock %}
+{% block contenu %}
+<div class="card card-indicateur p-4" style="max-width:500px;">
+    <h4>Confirmer la suppression</h4>
+    <p>Es-tu sûre de vouloir supprimer <strong>{{ objet }}</strong> ? Cette action est irréversible.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Supprimer</button>
+        <a href="{% url 'liste_employes' %}" class="btn btn-outline-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}

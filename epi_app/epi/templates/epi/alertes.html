@@ -1,0 +1,35 @@
+{% extends "epi/base.html" %}
+{% block titre %}Alertes{% endblock %}
+{% block contenu %}
+<h2 class="mb-4"><i class="bi bi-bell-fill text-danger"></i> Alertes — Équipements à surveiller</h2>
+
+<div class="card card-indicateur">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr><th>Employé</th><th>Atelier</th><th>Équipement</th><th>Date expiration</th><th>Statut</th><th></th></tr>
+        </thead>
+        <tbody>
+        {% for a in alertes %}
+            <tr>
+                <td>{{ a.employe }}</td>
+                <td>{{ a.employe.atelier }}</td>
+                <td>{{ a.type_epi }}</td>
+                <td>{{ a.date_expiration }}</td>
+                <td>
+                    {% if a.statut == "A_RENOUVELER" %}<span class="badge badge-renouveler">À renouveler</span>
+                    {% else %}<span class="badge badge-expire">Expiré</span>{% endif %}
+                </td>
+                <td class="text-end">
+                    <form method="post" action="{% url 'renouveler_attribution' a.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-success">Renouveler</button>
+                    </form>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">Aucune alerte — tout est en ordre ✅</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

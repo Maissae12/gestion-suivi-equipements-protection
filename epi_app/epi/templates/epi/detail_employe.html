@@ -1,0 +1,36 @@
+{% extends "epi/base.html" %}
+{% block titre %}{{ employe }}{% endblock %}
+{% block contenu %}
+<a href="{% url 'liste_employes' %}" class="btn btn-sm btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> Retour</a>
+
+<div class="card card-indicateur p-3 mb-4">
+    <h3>{{ employe.prenom }} {{ employe.nom }}</h3>
+    <p class="text-muted mb-0">Matricule : {{ employe.matricule }} — Atelier : {{ employe.atelier }} — Embauché le {{ employe.date_embauche }}</p>
+</div>
+
+<h5>Historique des équipements</h5>
+<div class="card card-indicateur">
+    <table class="table mb-0">
+        <thead>
+            <tr><th>Équipement</th><th>Date attribution</th><th>Date expiration</th><th>Statut</th><th>Actif</th></tr>
+        </thead>
+        <tbody>
+        {% for a in attributions %}
+            <tr>
+                <td>{{ a.type_epi }}</td>
+                <td>{{ a.date_attribution }}</td>
+                <td>{{ a.date_expiration }}</td>
+                <td>
+                    {% if a.statut == "OK" %}<span class="badge badge-ok">OK</span>
+                    {% elif a.statut == "A_RENOUVELER" %}<span class="badge badge-renouveler">À renouveler</span>
+                    {% else %}<span class="badge badge-expire">Expiré</span>{% endif %}
+                </td>
+                <td>{% if a.actif %}<i class="bi bi-check-circle text-success"></i>{% else %}<i class="bi bi-x-circle text-muted"></i>{% endif %}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-4">Aucun équipement attribué.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

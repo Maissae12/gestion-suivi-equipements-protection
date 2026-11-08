@@ -1,0 +1,208 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Connexion — Gestion EPI | OCP</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    :root{
+        --ocp-dark:#053724;
+        --ocp-green:#0a8a3f;
+        --ocp-lime:#a8d600;
+    }
+    body{
+        background: radial-gradient(circle at 50% 0%, #0d5c39 0%, #053724 60%, #02190f 100%);
+        height:100vh;
+        overflow:hidden;
+        font-family:'Segoe UI',Arial,sans-serif;
+    }
+    /* Particules décoratives en fond */
+    .bg-decor{
+        position:fixed; inset:0; pointer-events:none; z-index:0;
+    }
+    .bg-decor span{
+        position:absolute;
+        border-radius:50%;
+        background:rgba(168,214,0,0.08);
+        animation:float 12s infinite ease-in-out;
+    }
+
+    @keyframes float{
+        0%,100%{transform:translateY(0) scale(1);}
+        50%{transform:translateY(-30px) scale(1.1);}
+    }
+
+    .login-card{
+        width:370px;
+        border-radius:16px;
+        border:none;
+        background:#ffffff;
+        box-shadow:0 25px 60px rgba(0,0,0,0.45);
+        opacity:0;
+        transform:translateY(40px) scale(0.95);
+        position:relative;
+        z-index:1;
+    }
+
+    .login-card.show{
+        animation:cardIn 0.8s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    @keyframes cardIn{
+        to{ opacity:1; transform:translateY(0) scale(1); }
+    }
+
+    .logo-wrap{
+        display:flex;
+        justify-content:center;
+        margin-top:-70px;
+        margin-bottom:10px;
+    }
+    .logo-circle{
+        width:130px; height:130px;
+        background:#fff;
+        border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        box-shadow:0 10px 25px rgba(0,0,0,0.25);
+        opacity:0; transform:scale(0.4) rotate(-25deg);
+    }
+    .logo-circle.show{
+        animation:logoPop 0.9s cubic-bezier(.34,1.56,.64,1) forwards;
+        animation-delay:0.25s;
+    }
+    @keyframes logoPop{
+        to{ opacity:1; transform:scale(1) rotate(0); }
+    }
+    .logo-circle img{
+        width:110px;height:110px;object-fit:contain;
+    }
+
+    h4.title{
+        color:var(--ocp-dark);
+        font-weight:700;
+        letter-spacing:0.5px;
+    }
+    .subtitle{
+        color:#6c757d;
+        font-size:0.85rem;
+        margin-top:-8px;
+    }
+
+    .form-label{
+        font-size:0.85rem;
+        font-weight:600;
+        color:var(--ocp-dark);
+    }
+    .form-control{
+        border-radius:8px;
+        border:1px solid #dfe6e2;
+        padding:10px 14px;
+    }
+    .form-control:focus{
+        border-color:var(--ocp-green);
+        box-shadow:0 0 0 0.2rem rgba(10,138,63,0.15);
+    }
+
+    .btn-ocp{
+        background:linear-gradient(135deg,var(--ocp-green),var(--ocp-dark));
+        border:none;
+        color:#fff;
+        font-weight:600;
+        padding:10px;
+        border-radius:8px;
+        letter-spacing:0.5px;
+        transition:transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .btn-ocp:hover{
+        transform:translateY(-2px);
+        box-shadow:0 8px 18px rgba(5,55,36,0.35);
+        color:#fff;
+    }
+
+    .footer-note{
+        text-align:center;
+        font-size:0.75rem;
+        color:#9aa79f;
+        margin-top:14px;
+    }
+
+    .field-anim{
+        opacity:0;
+        transform:translateY(15px);
+    }
+    .field-anim.show{
+        animation:fieldIn 0.5s ease forwards;
+    }
+    @keyframes fieldIn{
+        to{opacity:1; transform:translateY(0);}
+    }
+</style>
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100">
+
+<div class="bg-decor" id="bgDecor"></div>
+
+<div class="card p-4 pt-5 login-card" id="loginCard">
+    <div class="logo-wrap">
+        <div class="logo-circle" id="logoCircle">
+<img src="{% static 'gestionepi/images/logo-ocp.png' %}" alt="Logo OCP">        </div>
+    </div>
+
+    <h4 class="text-center title mb-0">Gestion des EPI</h4><br>
+    <p class="text-center subtitle mb-4">Groupe OCP — Espace de connexion</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger py-2 field-anim" data-order="0">Identifiants incorrects.</div>
+        {% endif %}
+
+        <div class="mb-3 field-anim" data-order="1">
+            <label class="form-label">Nom d'utilisateur</label>
+            <input type="text" name="username" class="form-control" required>
+        </div>
+
+        <div class="mb-4 field-anim" data-order="2">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-ocp w-100 field-anim" data-order="3">Se connecter</button>
+    </form>
+
+    <p class="footer-note field-anim" data-order="4">© Office Chérifien des Phosphates</p>
+</div>
+
+<script>
+// Particules de fond décoratives
+const decor = document.getElementById('bgDecor');
+const sizes = [40,60,90,120,150,70,100];
+sizes.forEach((s,i)=>{
+    const el = document.createElement('span');
+    el.style.width = s+'px';
+    el.style.height = s+'px';
+    el.style.left = Math.random()*100+'%';
+    el.style.top = Math.random()*100+'%';
+    el.style.animationDelay = (i*0.7)+'s';
+    el.style.animationDuration = (10+Math.random()*8)+'s';
+    decor.appendChild(el);
+});
+
+// Séquence d'ouverture
+window.addEventListener('DOMContentLoaded', ()=>{
+    const card = document.getElementById('loginCard');
+    const logo = document.getElementById('logoCircle');
+
+    setTimeout(()=> card.classList.add('show'), 100);
+    setTimeout(()=> logo.classList.add('show'), 300);
+
+    document.querySelectorAll('.field-anim').forEach(el=>{
+        const order = parseInt(el.dataset.order || 0);
+        setTimeout(()=> el.classList.add('show'), 700 + order*120);
+    });
+});
+</script>
+
+</body>
+</html>

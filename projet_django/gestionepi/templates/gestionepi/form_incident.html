@@ -1,0 +1,29 @@
+{% extends "gestionepi/base.html" %}
+{% block titre %}Déclarer un incident{% endblock %}
+{% block contenu %}
+<h2 class="mb-4"><i class="bi bi-exclamation-triangle text-warning"></i> Déclarer un incident</h2>
+
+<div class="card card-indicateur p-4" style="max-width:600px;">
+    <p class="text-muted">
+        Équipement concerné : <strong>{{ attribution.type_epi }}</strong><br>
+        Employé : <strong>{{ attribution.employe }}</strong><br>
+        Attribué le : {{ attribution.date_attribution }}
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+        {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+            </div>
+        {% endfor %}
+        <p class="small text-muted">Cette action clôture l'équipement actuel et en attribue automatiquement un nouveau à l'employé, à la date du jour.</p>
+        <button type="submit" class="btn btn-warning">Confirmer la déclaration</button>
+        <a href="{% url 'liste_attributions' %}" class="btn btn-outline-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}

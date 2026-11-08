@@ -1,0 +1,131 @@
+{% extends "gestionepi/base.html" %}
+{% block titre %}Tableau de bord{% endblock %}
+{% block contenu %}
+<h2 class="mb-4">Tableau de bord</h2>
+
+<div class="row g-3 mb-4">
+    <div class="col-md">
+        <div class="card card-indicateur p-3 text-center">
+            <div class="text-muted small">Employés</div>
+            <div class="fs-2 fw-bold">{{ total_employes }}</div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card card-indicateur p-3 text-center">
+            <div class="text-muted small">EPI attribués</div>
+            <div class="fs-2 fw-bold">{{ total_attributions }}</div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card card-indicateur p-3 text-center">
+            <div class="text-muted small">Taux de conformité</div>
+            <div class="fs-2 fw-bold text-success">{{ taux_conformite }}%</div>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="card card-indicateur p-3 text-center">
+            <div class="text-muted small">Alertes actives</div>
+            <div class="fs-2 fw-bold text-danger">{{ nb_expire|add:nb_a_renouveler }}</div>
+        </div>
+    </div>
+   <div class="col-md">
+        <div class="card card-indicateur p-3 text-center">
+            <form method="get" class="mb-1">
+                <select name="periode" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="mois" {% if periode == "mois" %}selected{% endif %}>Ce mois</option>
+                    <option value="trimestre" {% if periode == "trimestre" %}selected{% endif %}>Ce trimestre</option>
+                    <option value="annee" {% if periode == "annee" %}selected{% endif %}>Cette année</option>
+                </select>
+            </form>
+            <div class="text-muted small">Coût des incidents</div>
+            <div class="fs-2 fw-bold text-danger">{{ cout_incidents_periode }} DH</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card card-indicateur p-3">
+            <h5>Répartition des statuts</h5>
+            <canvas id="chartStatuts" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-indicateur p-3">
+            <h5>Équipements expirés par atelier</h5>
+            <canvas id="chartAteliers" height="220"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-md-6">
+        <div class="card card-indicateur p-3">
+            <h5>Top employés à risque (pertes/dommages)</h5>
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr><th>Employé</th><th class="text-end">Incidents</th></tr>
+                </thead>
+                <tbody>
+                {% for e in top_employes_risque %}
+                    <tr>
+                        <td>{{ e.employe__prenom }} {{ e.employe__nom }}</td>
+                        <td class="text-end fw-bold text-danger">{{ e.nb_incidents }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="2" class="text-center text-muted py-3">Aucun incident enregistré.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% if epi_stock_faible %}
+<div class="row g-3 mt-1">
+    <div class="col-12">
+        <div class="card card-indicateur p-3 border-danger">
+            <h5 class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Stock faible</h5>
+            <table class="table table-sm mb-0">
+                <thead><tr><th>Équipement</th><th class="text-end">Stock actuel</th></tr></thead>
+                <tbody>
+                {% for t in epi_stock_faible %}
+                    <tr>
+                        <td>{{ t.nom }}</td>
+                        <td class="text-end fw-bold text-danger">{{ t.stock_disponible }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+new Chart(document.getElementById('chartStatuts'), {
+    type: 'pie',
+    data: {
+        labels: {{ statut_labels|safe }},
+        datasets: [{
+            data: {{ statut_data|safe }},
+            backgroundColor: ['#198754', '#fd7e14', '#dc3545']
+        }]
+    }
+});
+
+new Chart(document.getElementById('chartAteliers'), {
+    type: 'bar',
+    data: {
+        labels: {{ ateliers_labels|safe }},
+        datasets: [{
+            label: 'Équipements expirés',
+            data: {{ ateliers_data|safe }},
+            backgroundColor: '#033d26'
+        }]
+    },
+    options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+});
+</script>
+{% endblock %}

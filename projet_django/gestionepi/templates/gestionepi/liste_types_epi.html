@@ -1,0 +1,61 @@
+{% extends "gestionepi/base.html" %}
+{% block titre %}Catalogue EPI{% endblock %}
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Catalogue des EPI</h2>
+<a href="{% url 'creer_type_epi' %}" class="btn text-white" style="background-color:#053724;"><i class="bi bi-plus-lg"></i> Ajouter</a></div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Nom de l'EPI...">
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="duree" value="{{ duree }}" class="form-control" placeholder="Durée (mois)">
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="prix_min" value="{{ prix_min }}" class="form-control" placeholder="Prix min">
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="prix_max" value="{{ prix_max }}" class="form-control" placeholder="Prix max">
+    </div>
+    <div class="col-md-1">
+        <input type="number" name="stock" value="{{ stock }}" class="form-control" placeholder="Stock exact">
+    </div>
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-outline-secondary w-100">
+            <i class="bi bi-search"></i>
+        </button>
+    </div>
+    <div class="col-md-1">
+        <a href="{% url 'liste_types_epi' %}" class="btn btn-outline-secondary w-100">
+            <i class="bi bi-x-lg"></i>
+        </a>
+    </div>
+</form>
+
+<div class="card card-indicateur">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr><th>Nom</th><th>Durée de vie</th><th>Prix unitaire</th><th>Stock</th><th></th></tr>
+        </thead>
+        <tbody>
+        {% for t in types %}
+            <tr>
+                <td>{{ t.nom }}</td>
+                <td>{{ t.duree_vie_mois }} mois</td>
+                <td>{{ t.prix_unitaire }} MAD</td>
+                <td>{{ t.stock_disponible }}</td>
+                <td class="text-end">
+                    <a href="{% url 'modifier_type_epi' t.pk %}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    <a href="{% url 'supprimer_type_epi' t.pk %}" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-4">Aucun type d'EPI trouvé.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
